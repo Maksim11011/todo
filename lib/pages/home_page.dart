@@ -10,6 +10,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // Text Controller
+  final _controller = TextEditingController();
+
   //Список Задач
   List toDoList = [
     ["Выполнить Задачу1", false],
@@ -23,14 +26,34 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  //saveNewTask
+  void saveNewTask() {
+    setState(() {
+      toDoList.add([_controller.text, false]);
+      _controller.clear();
+    });
+    Navigator.of(context).pop();
+  }
+
   //Создание новой задачи
   void createNewTask() {
     showDialog(
       context: context,
       builder: (context) {
-        return DialogBox();
+        return DialogBox(
+          controller: _controller,
+          onSave: saveNewTask,
+          onCancel: () => Navigator.of(context).pop(),
+        );
       },
     );
+  }
+
+  //deleteTask
+  void deleteTask(int index) {
+    setState(() {
+      toDoList.removeAt(index);
+    });
   }
 
   @override
@@ -39,11 +62,11 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: const Color.fromARGB(255, 159, 168, 149),
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 39, 214, 74),
-        title: Text('To Do'),
+        title: const Text('To Do'),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: createNewTask,
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
       body: ListView.builder(
         itemCount: toDoList.length,
@@ -52,6 +75,7 @@ class _HomePageState extends State<HomePage> {
             taskName: toDoList[index][0],
             taskCompleted: toDoList[index][1],
             onChanged: (value) => checkBoxChanged(value, index),
+            deleteFunction: (context) => deleteTask(index),
           );
         },
       ),
